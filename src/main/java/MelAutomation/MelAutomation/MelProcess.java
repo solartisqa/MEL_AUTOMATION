@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import test.Configuration.PropertiesHandle;
 import test.exception.DatabaseException;
@@ -19,6 +21,7 @@ public class MelProcess
 	protected DatabaseOperation inputoutputtable;
 	protected DatabaseOperation expectedMelTable;
 	protected DatabaseOperation Outputtable;
+	protected DatabaseOperation actualMelTable;
 	
 	public MelProcess(PropertiesHandle configFile) throws MacroException
 	{
@@ -27,6 +30,15 @@ public class MelProcess
 		inputoutputtable = new DatabaseOperation();
 		expectedMelTable = new DatabaseOperation();
 		Outputtable = new DatabaseOperation();
+		actualMelTable = new DatabaseOperation();
+	}
+	
+	public void importActual() throws DatabaseException, PropertiesHandleException
+	{
+		PropertiesHandle DB1 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.254:3113/starrbopdb?useSSL=false","root","redhat");
+		DatabaseOperation.ConnectionSetup(DB1);
+		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/Starr_ISO_Development_ADMIN?useSSL=false","root","redhat");
+		DatabaseOperation.ConnectionSetup(DB2);
 	}
 	
 	public void generateExpectedMel() throws DatabaseException, SQLException
@@ -56,7 +68,6 @@ public class MelProcess
 			for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
 			{
 				
-				DatabaseOperation configTable1 = new DatabaseOperation();
 				LinkedHashMap<String, String> configtablerow = entry.getValue();
 				if (configtablerow.get("Flag").equals("Y"))
 				{
@@ -129,12 +140,60 @@ public class MelProcess
 		
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void Comparison(String actualTableName, String expectedTableName)
+	{
+		try
+		{
+			StringBuffer buffer = new StringBuffer();
+			
+			LinkedHashMap<Integer, LinkedHashMap<String, String>> actualTable = actualMelTable.GetDataObjects("Select * from "+actualTableName);
+			LinkedHashMap<Integer, LinkedHashMap<String, String>> expectedTable = expectedMelTable.GetDataObjects("Select * from "+expectedTableName);
+			Iterator it1 = actualTable.entrySet().iterator();
+			Iterator it2 = expectedTable.entrySet().iterator();
+		    while (it1.hasNext()&&it2.hasNext()) 
+		    {
+		        Map.Entry pair1 = (Entry) it1.next();
+		        LinkedHashMap<String, String> actualRow = (LinkedHashMap<String, String>) pair1.getValue();
+		        Map.Entry pair2 = (Entry) it2.next();
+		        LinkedHashMap<String, String> expectedRow = (LinkedHashMap<String, String>) pair2.getValue();
+		        
+				Iterator it3 = actualRow.entrySet().iterator();
+				Iterator it4 = expectedRow.entrySet().iterator();
+				
+				while (it3.hasNext()&&it4.hasNext()) 
+				{
+					 Map.Entry pair3 = (Entry) it3.next();
+					 Map.Entry pair4 = (Entry) it4.next();
+					 
+					 if(pair3.getValue().equals(pair4.getValue()))
+					 {
+						 
+					 }
+					 else
+					 {
+						System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
+						 buffer=buffer.append(pair4.getKey()).append("is failed");
+					 }
+				}
+		        //it1.remove(); // avoids a ConcurrentModificationException
+				System.out.println("comparison Result"+buffer);
+		    }
+		    
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
+	
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException
 	{
 		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/Starr_ISO_Development_ADMIN?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(configFile);
 		MelProcess processmel = new MelProcess(configFile);
-		processmel.generateExpectedMel();
+		//processmel.generateExpectedMel();
+		processmel.Comparison("MelActual", "MelActual_copy");
 		 Calendar calendar = Calendar.getInstance();
 
 		    int lastDate = calendar.getActualMaximum(Calendar.DATE);
