@@ -85,7 +85,7 @@ public class MelProcess
 						}
 						case "DefaultPolicyDetail":
 						{
-							lineMap.put(configtablerow.get("FieldNames"), "");
+							lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")));
 							break;
 						}
 						case "Bordereau_Date":
@@ -145,39 +145,20 @@ public class MelProcess
 	{
 		try
 		{
-			StringBuffer buffer = new StringBuffer();
-			
 			LinkedHashMap<Integer, LinkedHashMap<String, String>> actualTable = actualMelTable.GetDataObjects("Select * from "+actualTableName);
 			LinkedHashMap<Integer, LinkedHashMap<String, String>> expectedTable = expectedMelTable.GetDataObjects("Select * from "+expectedTableName);
 			Iterator it1 = actualTable.entrySet().iterator();
 			Iterator it2 = expectedTable.entrySet().iterator();
+			int i=1;
 		    while (it1.hasNext()&&it2.hasNext()) 
-		    {
+		    {		    	
 		        Map.Entry pair1 = (Entry) it1.next();
 		        LinkedHashMap<String, String> actualRow = (LinkedHashMap<String, String>) pair1.getValue();
 		        Map.Entry pair2 = (Entry) it2.next();
 		        LinkedHashMap<String, String> expectedRow = (LinkedHashMap<String, String>) pair2.getValue();
 		        
-				Iterator it3 = actualRow.entrySet().iterator();
-				Iterator it4 = expectedRow.entrySet().iterator();
-				
-				while (it3.hasNext()&&it4.hasNext()) 
-				{
-					 Map.Entry pair3 = (Entry) it3.next();
-					 Map.Entry pair4 = (Entry) it4.next();
-					 
-					 if(pair3.getValue().equals(pair4.getValue()))
-					 {
-						 
-					 }
-					 else
-					 {
-						System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
-						 buffer=buffer.append(pair4.getKey()).append("is failed");
-					 }
-				}
-		        //it1.remove(); // avoids a ConcurrentModificationException
-				System.out.println("comparison Result"+buffer);
+		        expectedMelTable.UpdateRow(i,lineToLineComparion(actualRow,expectedRow));
+		        i=i+1;
 		    }
 		    
 		}
@@ -185,6 +166,33 @@ public class MelProcess
 		{
 			
 		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public LinkedHashMap<String, String> lineToLineComparion (LinkedHashMap<String, String> actualRow,LinkedHashMap<String, String> expectedRow){
+		StringBuffer buffer = new StringBuffer();
+		Iterator it3 = actualRow.entrySet().iterator();
+		Iterator it4 = expectedRow.entrySet().iterator();
+		
+		while (it3.hasNext()&&it4.hasNext()) 
+		{
+			 Map.Entry pair3 = (Entry) it3.next();
+			 Map.Entry pair4 = (Entry) it4.next();
+			 
+			 if(pair3.getValue().equals(pair4.getValue()))
+			 {
+				 
+			 }
+			 else
+			 {
+				System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
+				buffer=buffer.append(pair4.getKey()).append(" is failed; ");
+			 }
+		}
+        //it1.remove(); // avoids a ConcurrentModificationException
+		expectedRow.put("AnalyserResult", buffer.toString());
+		System.out.println("comparison Result"+buffer);
+		return expectedRow;
 	}
 	
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException
