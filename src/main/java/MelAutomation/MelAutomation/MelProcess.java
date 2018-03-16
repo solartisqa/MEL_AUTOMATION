@@ -43,7 +43,7 @@ public class MelProcess
 	
 	public void generateExpectedMel() throws DatabaseException, SQLException
 	{
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("Select * from OUTPUT_Quote_ISO_V4");
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT a INNER JOIN OUTPUT_Quote_ISO_V4 b on a.S_No = b.`S.No` INNER JOIN OUTPUT_Payissue_ISO_V4 c on b.`S.No` = c.`S.No`");
 		for(Entry<Integer, LinkedHashMap<String, String>> entry1 : OutputTable.entrySet())
 		{
 			LinkedHashMap<String, String> InputOutputRow = entry1.getValue();
@@ -111,6 +111,18 @@ public class MelProcess
 							String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
 							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey, configtablerow.get("LookupTableName")));
 							break;
+						}
+						case "CommissionCalculation":
+						{
+							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
+							{
+								String value=Integer.toString((int) (Integer.parseInt(InputOutputRow.get(configtablerow.get("DBColumnNames")))*0.05));
+								lineMap.put(configtablerow.get("FieldNames"),value);
+							}
+							else if(InputOutputRow.get("ProductionChannel").equals("BOP CW"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"),Integer.toString((int) (Integer.parseInt(InputOutputRow.get(configtablerow.get("DBColumnNames")))*0.1)));
+							}
 						}
 					}
 				}
@@ -200,8 +212,8 @@ public class MelProcess
 		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/Starr_ISO_Development_ADMIN?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(configFile);
 		MelProcess processmel = new MelProcess(configFile);
-		//processmel.generateExpectedMel();
-		processmel.Comparison("MelActual", "MelActual_copy");
+		processmel.generateExpectedMel();
+		//processmel.Comparison("MelActual", "MelActual_copy");
 		 Calendar calendar = Calendar.getInstance();
 
 		    int lastDate = calendar.getActualMaximum(Calendar.DATE);
