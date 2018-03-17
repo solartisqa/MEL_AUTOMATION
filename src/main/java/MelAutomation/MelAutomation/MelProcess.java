@@ -1,6 +1,7 @@
 package MelAutomation.MelAutomation;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -109,20 +110,36 @@ public class MelProcess
 						case "PolicyWiseLookup":
 						{
 							String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
-							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey, configtablerow.get("LookupTableName")));
+							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,"Value", configtablerow.get("LookupTableName")));
 							break;
 						}
 						case "CommissionCalculation":
 						{
-							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
+							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC")&&configtablerow.get("FieldNames").equals("Agency_Commission_Amt"))
 							{
-								String value=Integer.toString((int) (Integer.parseInt(InputOutputRow.get(configtablerow.get("DBColumnNames")))*0.05));
+								Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.05;
+								DecimalFormat df = new DecimalFormat("#.##");
+								String value = df.format(floatvalue);
 								lineMap.put(configtablerow.get("FieldNames"),value);
 							}
-							else if(InputOutputRow.get("ProductionChannel").equals("BOP CW"))
+							else if(InputOutputRow.get("ProductionChannel").equals("BOP CW")&&(configtablerow.get("FieldNames").equals("Billing_Broker_Commission_Amt")||configtablerow.get("FieldNames").equals("Commission_Amt")))
 							{
-								lineMap.put(configtablerow.get("FieldNames"),Integer.toString((int) (Integer.parseInt(InputOutputRow.get(configtablerow.get("DBColumnNames")))*0.1)));
+								Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.1;
+								DecimalFormat df = new DecimalFormat("#.##");
+								String value = df.format(floatvalue);
+								lineMap.put(configtablerow.get("FieldNames"),value);
 							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"),"0");
+							}
+							break;
+						}
+						case "ProductionChannelBasedLookup":
+						{
+							String LookupKey = InputOutputRow.get("ProductionChannel");
+							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,configtablerow.get("DBColumnNames"), configtablerow.get("LookupTableName")));
+							break;
 						}
 					}
 				}
@@ -135,17 +152,18 @@ public class MelProcess
 		return lineMap;
 	}
 	
-	private String Lookup(String LookupKey,String TableName) throws DatabaseException
+	private String Lookup(String LookupKey,String LookupColumn,String TableName) throws DatabaseException
 	{
 		String LookupValue="";
 		DatabaseOperation LookupTable = new DatabaseOperation();
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects("Select * from "+TableName);
+		String Query="Select * from "+TableName;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
 		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
 		{
 			LinkedHashMap<String, String> LookupRow = entry.getValue();
 			if(LookupRow.get("Key").equals(LookupKey))
 			{
-				LookupValue=LookupRow.get("Value");
+				LookupValue=LookupRow.get(LookupColumn);
 			}
 		}
 		return LookupValue;
