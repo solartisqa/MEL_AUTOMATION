@@ -163,6 +163,7 @@ public class DatabaseOperation
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public void insertRow(LinkedHashMap<String, String> row) throws SQLException
 	{
 		for (Entry<String, String> entry : row.entrySet())	

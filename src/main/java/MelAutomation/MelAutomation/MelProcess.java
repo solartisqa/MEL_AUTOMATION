@@ -84,6 +84,7 @@ public class MelProcess
 							lineMap.put(configtablerow.get("FieldNames"),ExtendedLoopConfig.get(configtablerow.get("DBColumnNames")));
 							break;
 						}
+						
 						case "DefaultPolicyDetail":
 						{
 							lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")));
@@ -111,6 +112,19 @@ public class MelProcess
 						{
 							String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
 							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,"Value", configtablerow.get("LookupTableName")));
+							break;
+						}
+						case "PolicyWiseTwoLevelLookup":
+						{
+							//String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
+							//lineMap.put(configtablerow.get("FieldNames"), this.TwoLevelLookup(LookupKey,"Value", configtablerow.get("LookupTableName")));
+							//break;
+						}
+						case "BCEG_Code":
+						{
+							String Key1=InputOutputRow.get("BldgEff_class");
+							String Key2=InputOutputRow.get("BldgEff_grade");
+							lineMap.put(configtablerow.get("FieldNames"), this.TwoLevelLookup(Key1,Key2, configtablerow.get("LookupTableName")));
 							break;
 						}
 						case "CommissionCalculation":
@@ -141,6 +155,48 @@ public class MelProcess
 							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,configtablerow.get("DBColumnNames"), configtablerow.get("LookupTableName")));
 							break;
 						}
+						case "DynamicCoverageWiseLookup":
+						{
+							lineMap.put(configtablerow.get("FieldNames"),this.DynamicLookup(ExtendedLoopConfig.get("CoverageOrder"), InputOutputRow, configtablerow.get("LookupTableName")));
+							break;
+						}
+						case "Concat":
+						{
+							lineMap.put(configtablerow.get("FieldNames"), configtablerow.get("StaticValues")+InputOutputRow.get(configtablerow.get("DBColumnNames")));
+							break;
+						}
+						case "ISO_State_Exception_Ind_Code":
+						{
+							if(InputOutputRow.get("State").equals("MA"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "9");
+							}
+							else if(InputOutputRow.get("State").equals("MD"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "8");
+							}
+							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "9");
+							}
+							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "1");
+							}
+							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "2");
+							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"), "N/A");
+							}
+							break;
+						}
+						case "insuredFirstName":
+						{
+							
+						}
 					}
 				}
 			}
@@ -167,7 +223,50 @@ public class MelProcess
 			}
 		}
 		return LookupValue;
-		
+	}
+	
+	private String TwoLevelLookup(String Key1,String Key2,String TableName) throws DatabaseException
+	{
+		String LookupValue="";
+		DatabaseOperation LookupTable = new DatabaseOperation();
+		String Query="Select * from "+TableName;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
+		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+		{
+			LinkedHashMap<String, String> LookupRow = entry.getValue();
+			if(LookupRow.get("Key1").equals(Key1))
+			{
+				if(LookupRow.get("Key2").equals(Key2))
+				{
+					LookupValue=LookupRow.get("Value");
+				}
+			}
+		}
+		return LookupValue;
+	}
+	
+	private String DynamicLookup(String LookupKey,LinkedHashMap<String, String>InputOutputRow,String TableName) throws DatabaseException
+	{
+		String LookupValue="";
+		DatabaseOperation LookupTable = new DatabaseOperation();
+		String Query="Select * from "+TableName;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
+		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+		{
+			LinkedHashMap<String, String> LookupRow = entry.getValue();
+			if(LookupRow.get("Key").equals(LookupKey))
+			{
+				if(LookupRow.get("Nature").equals("default"))
+				{					
+					LookupValue=LookupRow.get("Value");					
+				}
+				else
+				{
+					LookupValue=InputOutputRow.get(LookupRow.get("Value"));	
+				}
+			}
+		}
+		return LookupValue;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

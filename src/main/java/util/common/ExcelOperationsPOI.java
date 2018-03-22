@@ -211,6 +211,7 @@ public class ExcelOperationsPOI
 		column_number++;
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public boolean has_next_row()
 	{
 		boolean result;
@@ -225,6 +226,7 @@ public class ExcelOperationsPOI
 		return result;
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public boolean has_next_row(int columnnumberr)
 	{
 		boolean result;
@@ -239,6 +241,7 @@ public class ExcelOperationsPOI
 		return result;
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public boolean has_next_column()
 	{
 		boolean result;
