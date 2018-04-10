@@ -38,24 +38,27 @@ public class MelProcess
 	{
 		PropertiesHandle DB1 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.254:3113/starrbopdb?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(DB1);
-		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/Starr_ISO_Development_ADMIN?useSSL=false","root","redhat");
+		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(DB2);
 	}
 	
 	public void generateExpectedMel() throws DatabaseException, SQLException
 	{
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT a INNER JOIN OUTPUT_Quote_ISO_V4 b on a.S_No = b.`S.No` INNER JOIN OUTPUT_Payissue_ISO_V4 c on b.`S.No` = c.`S.No`");
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT a INNER JOIN OUTPUT_ISO_Quote b on a.`S.No` = b.`S.No` INNER JOIN OUTPUT_ISO_PolicyIssuance c on b.`S.No` = c.`S.No`");
 		for(Entry<Integer, LinkedHashMap<String, String>> entry1 : OutputTable.entrySet())
 		{
 			LinkedHashMap<String, String> InputOutputRow = entry1.getValue();
-			LinkedHashMap<Integer, LinkedHashMap<String, String>> coverageData = configTable.GetDataObjects("Select * from MEL_CoverageOrder");
-			for (Entry<Integer, LinkedHashMap<String, String>> entry : coverageData.entrySet())	
+			if(InputOutputRow.get("Flag_for_execution").equals("Y"))
 			{
-				LinkedHashMap<String, String> configtablerow = entry.getValue();
-				
-				LinkedHashMap<String, String> SingleLine =new LinkedHashMap<String, String>();
-				SingleLine=this.GeneratLine(configtablerow,InputOutputRow);
-				expectedMelTable.insertRow(SingleLine);
+				LinkedHashMap<Integer, LinkedHashMap<String, String>> coverageData = configTable.GetDataObjects("Select * from MEL_CoverageOrder");
+				for (Entry<Integer, LinkedHashMap<String, String>> entry : coverageData.entrySet())	
+				{
+					LinkedHashMap<String, String> configtablerow = entry.getValue();
+					
+					LinkedHashMap<String, String> SingleLine =new LinkedHashMap<String, String>();
+					SingleLine=this.GeneratLine(configtablerow,InputOutputRow);
+					expectedMelTable.insertRow(SingleLine);
+				}
 			}
 		}
 	}
@@ -131,17 +134,27 @@ public class MelProcess
 						{
 							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC")&&configtablerow.get("FieldNames").equals("Agency_Commission_Amt"))
 							{
-								Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.05;
-								DecimalFormat df = new DecimalFormat("#.##");
-								String value = df.format(floatvalue);
-								lineMap.put(configtablerow.get("FieldNames"),value);
+								if(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))).equals(""))
+								{
+									lineMap.put(configtablerow.get("FieldNames"),"0");
+								}else {
+									Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.05;
+									DecimalFormat df = new DecimalFormat("#.##");
+									String value = df.format(floatvalue);
+									lineMap.put(configtablerow.get("FieldNames"),value);
+								}
 							}
 							else if(InputOutputRow.get("ProductionChannel").equals("BOP CW")&&(configtablerow.get("FieldNames").equals("Billing_Broker_Commission_Amt")||configtablerow.get("FieldNames").equals("Commission_Amt")))
 							{
-								Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.1;
-								DecimalFormat df = new DecimalFormat("#.##");
-								String value = df.format(floatvalue);
-								lineMap.put(configtablerow.get("FieldNames"),value);
+								if(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))).equals(""))
+								{
+									lineMap.put(configtablerow.get("FieldNames"),"0");
+								}else {
+									Double floatvalue = Double.parseDouble(InputOutputRow.get(ExtendedLoopConfig.get(configtablerow.get("DBColumnNames"))))*0.1;
+									DecimalFormat df = new DecimalFormat("#.##");
+									String value = df.format(floatvalue);
+									lineMap.put(configtablerow.get("FieldNames"),value);
+								}
 							}
 							else
 							{
@@ -203,7 +216,18 @@ public class MelProcess
 						}
 						case "chaseReferenceNumber":
 						{
-							lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")).replace("QOT-", "BOP"));
+							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")).replace("QOT-", "BOP"));
+							}
+							break;
+						}
+						case "CardType":
+						{
+							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")));
+							}
 							break;
 						}
 					}
@@ -335,7 +359,7 @@ public class MelProcess
 	
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException
 	{
-		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/Starr_ISO_Development_ADMIN?useSSL=false","root","redhat");
+		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(configFile);
 		MelProcess processmel = new MelProcess(configFile);
 		processmel.generateExpectedMel();
