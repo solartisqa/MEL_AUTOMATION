@@ -195,7 +195,16 @@ public class MelProcess
 						}
 						case "insuredFirstName":
 						{
-							
+							if(InputOutputRow.get("Entity_Type").equals("Sole Proprietor"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), configtablerow.get("StaticValues"));
+							}
+							break;
+						}
+						case "chaseReferenceNumber":
+						{
+							lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")).replace("QOT-", "BOP"));
+							break;
 						}
 					}
 				}
