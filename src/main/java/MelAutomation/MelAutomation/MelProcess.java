@@ -180,23 +180,23 @@ public class MelProcess
 						}
 						case "ISO_State_Exception_Ind_Code":
 						{
-							if(InputOutputRow.get("State").equals("MA"))
+							if(InputOutputRow.get("Loc_State").equals("MA"))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "9");
 							}
-							else if(InputOutputRow.get("State").equals("MD"))
+							else if(InputOutputRow.get("Loc_State").equals("MD"))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "8");
 							}
-							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "9");
 							}
-							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1977")&&InputOutputRow.get("LeadAbatement").equals("No")))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "1");
 							}
-							else if(InputOutputRow.get("State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1977")&&InputOutputRow.get("LeadAbatement").equals("Yes")))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "2");
 							}
