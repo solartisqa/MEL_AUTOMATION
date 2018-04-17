@@ -230,6 +230,40 @@ public class MelProcess
 							}
 							break;
 						}
+						case "ISO_BOP_Wind_Covg_Ded_Id_Code":
+						{
+							if(InputOutputRow.get("Loc_State").equals("RI"))
+							{
+								String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
+								lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,"RI", configtablerow.get("LookupTableName")));	
+							}
+							else
+							{
+								String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
+								lineMap.put(configtablerow.get("FieldNames"), this.Lookup(LookupKey,"CW", configtablerow.get("LookupTableName")));								
+							}
+							break;
+						}
+						case "Exposure_Basis_Code":
+						{
+							String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
+							String value1=this.Lookup(LookupKey,"Value", "Mel_ExposureBasicLookup1");
+							lineMap.put(configtablerow.get("FieldNames"), this.Lookup(value1,"Value", "Mel_ExposureBasicLookup2"));
+							break;
+						}
+						case "ISO_BOP_Lblty_Exposure_Ind_Code":
+						{
+							String LookupKey=InputOutputRow.get(configtablerow.get("DBColumnNames"));
+							String value1=this.Lookup(LookupKey,"Value", "Mel_ExposureBasicLookup1");
+							lineMap.put(configtablerow.get("FieldNames"),this.ISO_BOP_Lblty_Exposure_Ind_Code(ExtendedLoopConfig.get("CoverageOrder"), value1, configtablerow.get("LookupTableName")));
+							break;
+						}
+						
+						case "Loss_Cost_Multiplier":
+						{
+							lineMap.put(configtablerow.get("FieldNames"),this.Loss_Cost_Multiplier(InputOutputRow, configtablerow.get("LookupTableName")));
+							break;
+						}
 					}
 				}
 			}
@@ -300,6 +334,68 @@ public class MelProcess
 			}
 		}
 		return LookupValue;
+	}
+	
+
+	private String ISO_BOP_Lblty_Exposure_Ind_Code(String LookupKey,String ExposureBasis,String TableName) throws DatabaseException
+	{
+		String LookupValue="";
+		DatabaseOperation LookupTable = new DatabaseOperation();
+		String Query="Select * from "+TableName;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
+		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+		{
+			LinkedHashMap<String, String> LookupRow = entry.getValue();
+			if(LookupRow.get("Key").equals(LookupKey))
+			{
+				if(LookupRow.get("Nature").equals("default"))
+				{					
+					LookupValue=LookupRow.get("Value");					
+				}
+				else
+				{
+					if(ExposureBasis.equals("Limit of Insurance"))
+					{
+						LookupValue="5";
+					}
+					else
+					{
+						LookupValue="7";
+					}
+				}
+			}
+		}
+		return LookupValue;
+	}
+	
+	public String Loss_Cost_Multiplier(LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
+	{
+		String LookupValue="";
+		DatabaseOperation LookupTable = new DatabaseOperation();
+		String Query="Select * from "+Tablename;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
+		double premium51 =0;
+		double premium52 =0;
+		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+		{
+			LinkedHashMap<String, String> LookupRow = entry.getValue();
+			if(LookupRow.get("Value").equals("5.1"))
+			{
+				premium51=premium51+Double.parseDouble(InputOutputRow.get(LookupRow.get("Premium")));
+			}else {
+				premium52=premium52+Double.parseDouble(InputOutputRow.get(LookupRow.get("Premium")));
+			}
+		}
+		if(premium51>premium52)
+		{
+			LookupValue=this.Lookup(InputOutputRow.get("Loc_State"), "NonLiability", "Mel_LossCostMultiplier");
+		}
+		else
+		{
+			LookupValue=this.Lookup(InputOutputRow.get("Loc_State"), "Liability", "Mel_LossCostMultiplier");
+		}
+		return LookupValue;		
+		
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
