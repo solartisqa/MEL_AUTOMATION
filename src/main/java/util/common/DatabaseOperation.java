@@ -180,9 +180,28 @@ public class DatabaseOperation
 			temp1=temp1.append(entry.getKey()).append(",");
 		}
 		insterQuery=insterQuery.replace("temp1", temp1.substring(0, temp1.length() - 1)).replace("temp2", temp2.substring(0, temp2.length() - 1));
-		//System.out.println(insterQuery);
+		System.out.println(insterQuery);
 		java.sql.PreparedStatement ps = conn.prepareStatement(insterQuery);
 		ps.executeUpdate();
+	}
+	
+	public void copyAndInsertRow(PropertiesHandle configFile)
+	{
+		try
+		{
+			LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = this.GetDataObjects(configFile.getProperty("melconfig"));
+			StringBuffer temp1 = new StringBuffer();
+			//String insterQuery = "INSERT INTO MelActual(temp1) SELECT (temp2) FROM";	
+			for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+			{				
+				LinkedHashMap<String, String> configtablerow = entry.getValue();				
+				temp1=temp1.append("'").append(configtablerow.get("FieldNames")).append("'").append(",");
+			}
+		}
+		catch (Exception e)
+		{
+			
+		}
 	}
 	
 	public void UpdateTable(LinkedHashMap<Integer, LinkedHashMap<String, String>> table) throws DatabaseException

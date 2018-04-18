@@ -40,6 +40,8 @@ public class MelProcess
 		DatabaseOperation.ConnectionSetup(DB1);
 		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(DB2);
+		
+		actualMelTable.copyAndInsertRow(configFile);
 	}
 	
 	public void generateExpectedMel() throws DatabaseException, SQLException
@@ -261,7 +263,7 @@ public class MelProcess
 						
 						case "Loss_Cost_Multiplier":
 						{
-							lineMap.put(configtablerow.get("FieldNames"),this.Loss_Cost_Multiplier(InputOutputRow, configtablerow.get("LookupTableName")));
+							lineMap.put(configtablerow.get("FieldNames"),this.Loss_Cost_Multiplier(ExtendedLoopConfig.get("CoverageOrder"),InputOutputRow, configtablerow.get("LookupTableName")));
 							break;
 						}
 					}
@@ -368,7 +370,33 @@ public class MelProcess
 		return LookupValue;
 	}
 	
-	public String Loss_Cost_Multiplier(LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
+	public String Loss_Cost_Multiplier(String LookupKey,LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
+	{
+		String LookupValue="";
+		DatabaseOperation LookupTable = new DatabaseOperation();
+		String Query="Select * from "+Tablename;
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
+		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
+		{
+			LinkedHashMap<String, String> LookupRow = entry.getValue();
+			if(LookupRow.get("Key").equals(LookupKey))
+			{
+				if(LookupRow.get("Value").equals("5.1"))
+				{
+					LookupValue=this.Lookup(InputOutputRow.get("Loc_State"), "NonLiability", "Mel_LossCostMultiplier");
+				}
+				else
+				{
+					LookupValue=this.Lookup(InputOutputRow.get("Loc_State"), "Liability", "Mel_LossCostMultiplier");
+				}
+			}
+		}
+		
+		return LookupValue;		
+		
+	}
+	
+	public String split(LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
 	{
 		String LookupValue="";
 		DatabaseOperation LookupTable = new DatabaseOperation();
