@@ -1,35 +1,20 @@
 package MelAutomation.MelAutomation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import test.Configuration.PropertiesHandle;
 import test.exception.DatabaseException;
 import test.exception.MacroException;
 import test.exception.PropertiesHandleException;
 import util.common.DatabaseOperation;
-import util.common.ExcelOperationsPOI;
 
-public class MelProcess 
+public class MelProcess extends MelProcessBaseClass
 {
 	protected DatabaseOperation configTable = null;
 	protected PropertiesHandle configFile;
@@ -55,8 +40,6 @@ public class MelProcess
 		DatabaseOperation.ConnectionSetup(DB1);
 		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(DB2);
-		
-		actualMelTable.copyAndInsertRow(configFile);
 	}
 	
 	public void generateExpectedMel() throws DatabaseException, SQLException
@@ -80,7 +63,7 @@ public class MelProcess
 		}
 	}
 	
-	private LinkedHashMap<String, String> GeneratLine(LinkedHashMap<String, String> ExtendedLoopConfig, LinkedHashMap<String, String>InputOutputRow)
+	public LinkedHashMap<String, String> GeneratLine(LinkedHashMap<String, String> ExtendedLoopConfig, LinkedHashMap<String, String>InputOutputRow)
 	{
 		LinkedHashMap<String, String> lineMap = new LinkedHashMap<String, String>();
 		try
@@ -281,6 +264,12 @@ public class MelProcess
 							lineMap.put(configtablerow.get("FieldNames"),this.Loss_Cost_Multiplier(ExtendedLoopConfig.get("CoverageOrder"),InputOutputRow, configtablerow.get("LookupTableName")));
 							break;
 						}
+						
+						case "Coverage":
+						{
+							lineMap.put(configtablerow.get("FieldNames"),ExtendedLoopConfig.get("CoverageOrder"));
+							break;
+						}
 					}
 				}
 			}
@@ -292,68 +281,6 @@ public class MelProcess
 		return lineMap;
 	}
 	
-	private String Lookup(String LookupKey,String LookupColumn,String TableName) throws DatabaseException
-	{
-		String LookupValue="";
-		DatabaseOperation LookupTable = new DatabaseOperation();
-		String Query="Select * from "+TableName;
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
-		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
-		{
-			LinkedHashMap<String, String> LookupRow = entry.getValue();
-			if(LookupRow.get("Key").equals(LookupKey))
-			{
-				LookupValue=LookupRow.get(LookupColumn);
-			}
-		}
-		return LookupValue;
-	}
-	
-	private String TwoLevelLookup(String Key1,String Key2,String TableName) throws DatabaseException
-	{
-		String LookupValue="";
-		DatabaseOperation LookupTable = new DatabaseOperation();
-		String Query="Select * from "+TableName;
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
-		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
-		{
-			LinkedHashMap<String, String> LookupRow = entry.getValue();
-			if(LookupRow.get("Key1").equals(Key1))
-			{
-				if(LookupRow.get("Key2").equals(Key2))
-				{
-					LookupValue=LookupRow.get("Value");
-				}
-			}
-		}
-		return LookupValue;
-	}
-	
-	private String DynamicLookup(String LookupKey,LinkedHashMap<String, String>InputOutputRow,String TableName) throws DatabaseException
-	{
-		String LookupValue="";
-		DatabaseOperation LookupTable = new DatabaseOperation();
-		String Query="Select * from "+TableName;
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> tablePumpinData = LookupTable.GetDataObjects(Query);
-		for (Entry<Integer, LinkedHashMap<String, String>> entry : tablePumpinData.entrySet())	
-		{
-			LinkedHashMap<String, String> LookupRow = entry.getValue();
-			if(LookupRow.get("Key").equals(LookupKey))
-			{
-				if(LookupRow.get("Nature").equals("default"))
-				{					
-					LookupValue=LookupRow.get("Value");					
-				}
-				else
-				{
-					LookupValue=InputOutputRow.get(LookupRow.get("Value"));	
-				}
-			}
-		}
-		return LookupValue;
-	}
-	
-
 	private String ISO_BOP_Lblty_Exposure_Ind_Code(String LookupKey,String ExposureBasis,String TableName) throws DatabaseException
 	{
 		String LookupValue="";
@@ -411,7 +338,8 @@ public class MelProcess
 		
 	}
 	
-	public String split(LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
+	@SuppressWarnings("unused")
+	private String split(LinkedHashMap<String, String>InputOutputRow,String Tablename) throws DatabaseException
 	{
 		String LookupValue="";
 		DatabaseOperation LookupTable = new DatabaseOperation();
@@ -440,183 +368,7 @@ public class MelProcess
 		return LookupValue;		
 		
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void Comparison(String actualTableName, String expectedTableName)
-	{
-		try
-		{
-			LinkedHashMap<Integer, LinkedHashMap<String, String>> actualTable = actualMelTable.GetDataObjects("Select * from "+actualTableName);
-			LinkedHashMap<Integer, LinkedHashMap<String, String>> expectedTable = expectedMelTable.GetDataObjects("Select * from "+expectedTableName);
-			Iterator it1 = actualTable.entrySet().iterator();
-			Iterator it2 = expectedTable.entrySet().iterator();
-			int i=1;
-		    while (it1.hasNext()&&it2.hasNext()) 
-		    {		    	
-		        Map.Entry pair1 = (Entry) it1.next();
-		        LinkedHashMap<String, String> actualRow = (LinkedHashMap<String, String>) pair1.getValue();
-		        Map.Entry pair2 = (Entry) it2.next();
-		        LinkedHashMap<String, String> expectedRow = (LinkedHashMap<String, String>) pair2.getValue();
-		        
-		        expectedMelTable.UpdateRow(i,lineToLineComparion(actualRow,expectedRow));
-		        i=i+1;
-		    }
-		    generateReport(expectedTable);
-		    
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public LinkedHashMap<String, String> lineToLineComparion (LinkedHashMap<String, String> actualRow,LinkedHashMap<String, String> expectedRow){
-		StringBuffer buffer = new StringBuffer();
-		Iterator it3 = actualRow.entrySet().iterator();
-		Iterator it4 = expectedRow.entrySet().iterator();
 		
-		while (it3.hasNext()&&it4.hasNext()) 
-		{
-			 Map.Entry pair3 = (Entry) it3.next();
-			 Map.Entry pair4 = (Entry) it4.next();
-			 
-			 if(pair3.getValue().equals(pair4.getValue()))
-			 {
-				 
-			 }
-			 else
-			 {
-				System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
-				buffer=buffer.append(pair4.getKey()).append(" is failed; ");
-			 }
-		}
-        //it1.remove(); // avoids a ConcurrentModificationException
-		expectedRow.put("AnalyserResult", buffer.toString());
-		System.out.println("comparison Result"+buffer);
-		return expectedRow;
-	}
-	protected String excelreportlocation;
-	public void generateReport(LinkedHashMap<Integer, LinkedHashMap<String, String>> expectedTable)
-	{
-		try 
-		{
-			DatabaseOperation db=new DatabaseOperation();
-			Date date = new Date();
-			String DateandTime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
-			table1=db.GetDataObjects("SELECT AnalyserResult, COUNT(*) as NoOfCount FROM "+config.getProperty("outputTable")+"  GROUP BY AnalyserResult");
-			Iterator<Entry<Integer, LinkedHashMap<String,String>>> inputtableiterator = table1.entrySet().iterator();
-			excelreportlocation="AnalysisReport "+DateandTime+".xls";
-			String excelreportlocation1=config.getProperty("report_location")+config.getProperty("ExecutionName")+"_AnalysisReport_"+DateandTime+".xls";
-			String Samplepath = config.getProperty("report_template_location")+"ResultTemplate.xls";
-			
-			ExcelOperationsPOI sample=new ExcelOperationsPOI(Samplepath);
-			sample.Copy(Samplepath, excelreportlocation1);
-			sample.save();
-			if(comparisonChoice.equals("Y"))
-		    {
-				ExcelOperationsPOI ob=new ExcelOperationsPOI(excelreportlocation1);
-				ob.getsheets("TestReport");
-				ob.write_data(5, 4,config.getProperty("Project")+"-"+config.getProperty("API"));
-				Date today=new Date();
-				ob.write_data(5, 7,today);
-				ob.write_data(5, 14,config.getProperty("ExecutionName"));
-				int	row=9;
-				int si_no=1;
-				while (inputtableiterator.hasNext()) 
-				{
-					 Entry<Integer, LinkedHashMap<String, String>> inputentry = inputtableiterator.next();
-					 LinkedHashMap<String, String> inputrow = inputentry.getValue();
-					
-					    ob.write_data(row, 2,si_no );
-					    ob.write_data(row,3,inputrow.get("AnalyserResult"));
-					    ob.write_data(row,4,Integer.parseInt(inputrow.get("NoOfCount")));
-						
-					 row++;
-					 si_no++;
-					 
-				}
-				ob.refresh();
-				ob.saveAs(excelreportlocation1);
-		    }
-			this.ExportToExcelTable(config.getProperty("TestcaseQuery"), excelreportlocation1, "Testcases");
-			this.ExportToExcelTable(config.getProperty("resultQuery"), excelreportlocation1, "ComparisonResults");
-		}
-		catch(Exception e) 
-		{
-			System.out.print("error in copy Sample Report Template");
-			e.printStackTrace();
-		}
-	}
-	
-
-	@SuppressWarnings("resource")
-	public void ExportToExcelTable(String Query,String FileToExport,String Sheet) throws DatabaseException, SQLException, FileNotFoundException, IOException
-	{
-		
-		try
-		{
-			System.out.println("Exporting Report with Test cases to Excel");
-			DatabaseOperation db=new DatabaseOperation();
-			ResultSet rs=null;
-			HSSFWorkbook workBook=null;
-			HSSFSheet sheet =null;
-			rs=db.GetQueryResultsSet(Query);
-			File file = new File(FileToExport);
-			if(!file.exists())                               //Creation of Workbook and Sheet
-			{
-				workBook =new HSSFWorkbook();
-			}
-			else
-			{
-				workBook = new HSSFWorkbook(new FileInputStream(FileToExport));
-			}
-			sheet = workBook.createSheet(Sheet);
-                                                                                         //import columns to Excel
-			ResultSetMetaData metaData=rs.getMetaData();
-			int columnCount=metaData.getColumnCount();
-			ArrayList<String> columns = new ArrayList<String>();
-			for (int i = 1; i <= columnCount; i++) 
-			{
-				String columnName = metaData.getColumnName(i);
-				columns.add(columnName);
-			}
-		    
-			HSSFRow row = sheet.createRow(0);
-			int  Fieldcol=0; 
-			for (String columnName : columns) 
-			{
-				row.createCell(Fieldcol).setCellValue(columnName);
-				Fieldcol++;
-			}
-                                                            //import column values to Excel	
-			int ValueRow=1;
-			do
-			{
-				int Valuecol=0;
-				HSSFRow valrow = sheet.createRow(ValueRow);
-				for (String columnName : columns)
-				{
-					String value = rs.getString(columnName);
-					valrow.createCell(Valuecol).setCellValue(value);
-					Valuecol++;
-				}
-				ValueRow++;
-			} while (rs.next());
-		                                                    //Save the Details and close the File
-		
-	          FileOutputStream out = new FileOutputStream(FileToExport);
-	          workBook.write(out);
-	          out.close();
-	          System.out.println("REPORT GENERATED SUCCESSFULLY ON DISK");
-		 }
-	     catch (Exception e) 
-	     {
-	    	 System.out.println("Error in Exporting the Testcase with Results");	 
-	       e.printStackTrace();
-	     }
-	}
-	
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException
 	{
 		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
