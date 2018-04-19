@@ -1,4 +1,4 @@
-package util.common;
+package com.solartis.test.util.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,10 +19,9 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.mysql.jdbc.PreparedStatement;
-
-import test.Configuration.PropertiesHandle;
-import test.exception.DatabaseException;
-import test.exception.POIException;
+import com.solartis.test.configuration.PropertiesHandle;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.POIException;
 
 
 public class DatabaseOperation

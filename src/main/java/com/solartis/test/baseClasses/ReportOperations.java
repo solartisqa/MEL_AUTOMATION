@@ -1,4 +1,4 @@
-package MelAutomation.MelAutomation;
+package com.solartis.test.baseClasses;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import test.Configuration.PropertiesHandle;
-import test.exception.DatabaseException;
-import test.exception.POIException;
-import util.common.DatabaseOperation;
-import util.common.ExcelOperationsPOI;
+import com.solartis.test.configuration.PropertiesHandle;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.POIException;
+import com.solartis.test.util.common.DatabaseOperation;
+import com.solartis.test.util.common.ExcelOperationsPOI;
 
 public class ReportOperations extends ReportOperation
 {

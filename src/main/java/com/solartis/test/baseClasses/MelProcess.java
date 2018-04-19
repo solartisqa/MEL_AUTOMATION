@@ -1,4 +1,4 @@
-package MelAutomation.MelAutomation;
+package com.solartis.test.baseClasses;
 
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -8,11 +8,11 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import test.Configuration.PropertiesHandle;
-import test.exception.DatabaseException;
-import test.exception.MacroException;
-import test.exception.PropertiesHandleException;
-import util.common.DatabaseOperation;
+import com.solartis.test.configuration.PropertiesHandle;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.MacroException;
+import com.solartis.test.exception.PropertiesHandleException;
+import com.solartis.test.util.common.DatabaseOperation;
 
 public class MelProcess extends MelProcessBaseClass
 {

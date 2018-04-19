@@ -1,4 +1,4 @@
-package util.common;
+package com.solartis.test.util.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import test.exception.POIException;
+import com.solartis.test.exception.POIException;
 
 
 

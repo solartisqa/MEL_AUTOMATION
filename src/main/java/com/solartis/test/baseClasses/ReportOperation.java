@@ -1,4 +1,4 @@
-package MelAutomation.MelAutomation;
+package com.solartis.test.baseClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,10 +13,10 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import test.exception.DatabaseException;
-import test.exception.POIException;
-import util.common.DatabaseOperation;
-import util.common.ExcelOperationsPOI;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.POIException;
+import com.solartis.test.util.common.DatabaseOperation;
+import com.solartis.test.util.common.ExcelOperationsPOI;
 
 public abstract class ReportOperation 
 {

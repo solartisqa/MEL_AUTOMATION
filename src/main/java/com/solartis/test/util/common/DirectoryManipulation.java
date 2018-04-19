@@ -1,4 +1,4 @@
-package util.common;
+package com.solartis.test.util.common;
 
 import java.io.File;
 import java.io.FileInputStream;

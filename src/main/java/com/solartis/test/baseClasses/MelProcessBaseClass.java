@@ -1,4 +1,4 @@
-package MelAutomation.MelAutomation;
+package com.solartis.test.baseClasses;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import test.exception.DatabaseException;
-import test.exception.PropertiesHandleException;
-import util.common.DatabaseOperation;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.PropertiesHandleException;
+import com.solartis.test.util.common.DatabaseOperation;
 
 public abstract class MelProcessBaseClass 
 {

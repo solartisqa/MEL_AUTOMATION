@@ -1,4 +1,4 @@
-package test.exception;
+package com.solartis.test.exception;
 
 public class POIException extends Exception 
 {

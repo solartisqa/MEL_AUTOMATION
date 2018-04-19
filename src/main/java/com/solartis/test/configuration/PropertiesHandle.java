@@ -1,4 +1,4 @@
-package test.Configuration;
+package com.solartis.test.configuration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 
-import test.exception.DatabaseException;
-import test.exception.PropertiesHandleException;
-import util.common.DatabaseOperation;
+import com.solartis.test.exception.DatabaseException;
+import com.solartis.test.exception.PropertiesHandleException;
+import com.solartis.test.util.common.DatabaseOperation;
 
 public class PropertiesHandle extends Properties
 {
