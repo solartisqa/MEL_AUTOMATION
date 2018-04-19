@@ -11,11 +11,7 @@ import test.exception.DatabaseException;
 import test.exception.PropertiesHandleException;
 import util.common.DatabaseOperation;
 
-
-
-
 public class PropertiesHandle extends Properties
-
 {
 	private static final long serialVersionUID = 1L;
 	protected String path = null;
@@ -29,17 +25,12 @@ public class PropertiesHandle extends Properties
 	static DatabaseOperation ConfigQuery = new DatabaseOperation();
 			
 	    public PropertiesHandle( String JDBC_DRIVER, String DB_URL, String USER, String password) throws DatabaseException, PropertiesHandleException
-		{
-			
-			
+		{			
 			this.JDBC_DRIVER=JDBC_DRIVER;
 			this.DB_URL=DB_URL;
 			this.USER=USER;
-			this.password=password;
-			
-			
-			WriteProperty(UserName);
-			
+			this.password=password;			
+			WriteProperty(UserName);			
 		}
 		
 		protected void WriteProperty(String UserName) throws DatabaseException, PropertiesHandleException
@@ -53,21 +44,12 @@ public class PropertiesHandle extends Properties
 			this.put("db_password", this.password);
 		    DatabaseOperation.CloseConn();		 
 		}
-		
-
-
 	
 		protected void ActualAndStatus(String Actual, String Status)// FUNCTION FOR ACTUAL AND STATUS OCCURANCE
 		{
 			this.put("actual", Actual);
 			this.put("status", Status);
-		}	
-		
-		
-	
-	
-		
-	
+		}		
 		
 		public PropertiesHandle(String path) throws PropertiesHandleException
 		{
@@ -122,7 +104,6 @@ public class PropertiesHandle extends Properties
 				 writer = new FileWriter(this.path);
 			} catch (IOException e) 
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try 
@@ -130,7 +111,6 @@ public class PropertiesHandle extends Properties
 				this.store(writer, "File saved");
 			} catch (IOException e) 
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			};
 		}
