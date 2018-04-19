@@ -1,4 +1,4 @@
-package com.solartis.test.baseClasses;
+package com.solartis.test.product.StarrBOP;
 
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import com.solartis.test.baseClasses.MelProcessBaseClass;
 import com.solartis.test.configuration.PropertiesHandle;
 import com.solartis.test.exception.DatabaseException;
 import com.solartis.test.exception.MacroException;

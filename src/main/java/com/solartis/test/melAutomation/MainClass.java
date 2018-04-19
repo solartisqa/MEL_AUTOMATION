@@ -3,11 +3,11 @@ package com.solartis.test.melAutomation;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-import com.solartis.test.baseClasses.MelProcess;
 import com.solartis.test.configuration.PropertiesHandle;
 import com.solartis.test.exception.DatabaseException;
 import com.solartis.test.exception.MacroException;
 import com.solartis.test.exception.PropertiesHandleException;
+import com.solartis.test.product.StarrBOP.MelProcess;
 import com.solartis.test.util.common.DatabaseOperation;
 
 public class MainClass 
