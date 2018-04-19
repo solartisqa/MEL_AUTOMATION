@@ -276,7 +276,8 @@ public class ExcelOperationsPOI
 	
 	public void write_data(int rownum,int columnnum,Object strData)
 	{
-		 cell = this.worksheet.getRow(rownum).getCell(columnnum);
+		System.out.println(rownum+"===="+columnnum); 
+		cell = this.worksheet.getRow(rownum).getCell(columnnum);
 		 String s=(strData.getClass()).toString();
 		 //System.out.println(s);
 		if(s.equals("class java.util.Date"))
@@ -365,10 +366,12 @@ public class ExcelOperationsPOI
 		
 		catch (FileNotFoundException e) 
 		{
+			e.printStackTrace();
 			throw new POIException("ERROR OCCURS WHILE COPYING THE WORKBOOK -- FILENOTFOUND", e);
 		} 
 		catch (IOException e)
 		{
+			e.printStackTrace();
 			throw new POIException("ERROR OCCURS WHILE COPYING THE WORKBOOK -- I/O OPERATION FAILED", e);
 		
 		}

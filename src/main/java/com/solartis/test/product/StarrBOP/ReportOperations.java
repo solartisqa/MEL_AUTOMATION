@@ -2,6 +2,7 @@ package com.solartis.test.product.StarrBOP;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -22,10 +23,15 @@ public class ReportOperations extends ReportOperation
 	protected LinkedHashMap<Integer, LinkedHashMap<String, String>> AnalyserResult;
 	protected LinkedHashMap<Integer, LinkedHashMap<String, String>> RecordCount;
 	
-	public ReportOperations(String Samplepath, String excelreportlocation)
+	public ReportOperations(String Samplepath, String excelreportlocation) throws POIException, DatabaseException, FileNotFoundException, IOException
 	{
-		this.excelreportlocation=excelreportlocation;
+		Date date = new Date();
+		String DateandTime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
+		this.excelreportlocation=excelreportlocation+"AnalysisReport "+DateandTime+".xls";;
 		this.Samplepath=Samplepath;
+		this.generateReport(Samplepath, this.excelreportlocation);
+		this.pumpResulttoReport("MelActual");
+		this.importExpectedActualMELFeeds();
 	}	
 	
 	public void pumpResulttoReport(String TableName) throws DatabaseException, POIException
@@ -76,7 +82,7 @@ public class ReportOperations extends ReportOperation
 	
 	public void importExpectedActualMELFeeds() throws FileNotFoundException, DatabaseException, IOException
 	{
-		ExportToExcelTable("Select * from", excelreportlocation, "Expected");
-	    ExportToExcelTable("Select * from", excelreportlocation, "Actual");
+		ExportToExcelTable("Select * from MelActual", excelreportlocation, "Expected");
+	    ExportToExcelTable("Select * from MelActual_copy", excelreportlocation, "Actual");
 	}
 }

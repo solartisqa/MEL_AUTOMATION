@@ -179,7 +179,7 @@ public class DatabaseOperation
 			temp1=temp1.append(entry.getKey()).append(",");
 		}
 		insterQuery=insterQuery.replace("temp1", temp1.substring(0, temp1.length() - 1)).replace("temp2", temp2.substring(0, temp2.length() - 1));
-		System.out.println(insterQuery);
+		//System.out.println(insterQuery);
 		java.sql.PreparedStatement ps = conn.prepareStatement(insterQuery);
 		ps.executeUpdate();
 	}

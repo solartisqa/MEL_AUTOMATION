@@ -83,6 +83,8 @@ public abstract class MelProcessBaseClass
 	{
 		try
 		{
+			expectedMelTable = new DatabaseOperation();
+			actualMelTable = new DatabaseOperation();
 			String actualQuery ="Select * from "+actualTableName;
 			String expectedQuery = "Select * from "+expectedTableName;
 			LinkedHashMap<Integer, LinkedHashMap<String, String>> actualTable = actualMelTable.GetDataObjects(actualQuery);
@@ -125,7 +127,7 @@ public abstract class MelProcessBaseClass
 			 else
 			 {
 				System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
-				buffer=buffer.append(pair4.getKey()).append(" is failed; ");
+				buffer=buffer.append(pair4.getKey()).append("; ");
 			 }
 		}
         //it1.remove(); // avoids a ConcurrentModificationException
