@@ -122,11 +122,9 @@ public abstract class MelProcessBaseClass
 			 
 			 if(pair3.getValue().equals(pair4.getValue()))
 			 {
-				 
 			 }
 			 else
 			 {
-				System.out.println(pair4.getValue()+"=============================="+pair3.getValue());
 				buffer=buffer.append(pair4.getKey()).append("; ");
 			 }
 		}

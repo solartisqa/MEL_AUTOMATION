@@ -18,14 +18,15 @@ import com.solartis.test.util.common.DatabaseOperation;
 
 public class MainClass 
 {
+	@SuppressWarnings("unused")
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException, FileNotFoundException, POIException, IOException
 	{
 		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(configFile);
 		MelProcessBaseClass processmel = new MelProcess(configFile);
 		
-		//processmel.generateExpectedMel();
-		processmel.Comparison("MelActual", "MelActual_copy");
+		processmel.generateExpectedMel();
+		processmel.Comparison("MelActual_copy", "MelActual");
 		ReportOperation report = new ReportOperations("E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\SampleReport\\MELAnalysisReport.xls", "E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\Result\\");
 		 Calendar calendar = Calendar.getInstance();
 

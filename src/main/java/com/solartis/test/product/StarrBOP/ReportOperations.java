@@ -37,31 +37,33 @@ public class ReportOperations extends ReportOperation
 	public void pumpResulttoReport(String TableName) throws DatabaseException, POIException
 	{
 		DatabaseOperation db=new DatabaseOperation();
-		AnalyserResult=db.GetDataObjects("SELECT Policy_Number,AnalyserResult FROM `"+TableName+"`");
-		RecordCount=db.GetDataObjects("SELECT Policy_Number,Coverage,Count(*) AS NoOfCount FROM `"+TableName+"` GROUP BY Policy_Number");
+		AnalyserResult=db.GetDataObjects("SELECT Policy_Number,Coverage,AnalyserResult FROM `"+TableName+"`");
+		RecordCount=db.GetDataObjects("SELECT Policy_Number,Count(*) AS `NoOfCount` FROM `"+TableName+"` GROUP BY Policy_Number");
 		
 		Iterator<Entry<Integer, LinkedHashMap<String,String>>> inputtableiterator = AnalyserResult.entrySet().iterator();
 		Iterator<Entry<Integer, LinkedHashMap<String,String>>> inputtableiterator1 = RecordCount.entrySet().iterator();
 		ExcelOperationsPOI ob=new ExcelOperationsPOI(excelreportlocation);
 		ob.getsheets("Report");
 		Date today=new Date();
-		ob.write_data(9, 4,today);
-		int	row=12;
+		System.out.println(today);
+		ob.write_data(7, 4,today);
+		int	row=10;
 		int si_no=1;
 		while (inputtableiterator1.hasNext()) 
 		{
-			 Entry<Integer, LinkedHashMap<String, String>> inputentry = inputtableiterator.next();
+			 Entry<Integer, LinkedHashMap<String, String>> inputentry = inputtableiterator1.next();
 			 LinkedHashMap<String, String> inputrow = inputentry.getValue();
 			
-			    ob.write_data(row, 8,si_no );
-			    ob.write_data(row,9,inputrow.get("Policy_Number"));
-			    ob.write_data(row,10,Integer.parseInt(inputrow.get("NoOfCount")));
+			    ob.write_data(row, 7,si_no );
+			    ob.write_data(row,8,inputrow.get("Policy_Number"));
+			    ob.write_data(row,9,Integer.parseInt(inputrow.get("NoOfCount")));
 				
 			 row++;
 			 si_no++;
 			 
 		}
 		si_no=1;
+		row=10;
 		while (inputtableiterator.hasNext()) 
 		{
 			 Entry<Integer, LinkedHashMap<String, String>> inputentry = inputtableiterator.next();
@@ -69,8 +71,8 @@ public class ReportOperations extends ReportOperation
 			
 			    ob.write_data(row, 2,si_no );
 			    ob.write_data(row,3,inputrow.get("Policy_Number"));
-			    ob.write_data(row,4,Integer.parseInt(inputrow.get("Coverage")));
-			    ob.write_data(row,5,Integer.parseInt(inputrow.get("AnalyserResult")));
+			    ob.write_data(row,4,inputrow.get("Coverage"));
+			    ob.write_data(row,5,inputrow.get("AnalyserResult"));
 				
 			 row++;
 			 si_no++;
