@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.solartis.test.configuration.PropertiesHandle;
 import com.solartis.test.exception.DatabaseException;
 import com.solartis.test.exception.PropertiesHandleException;
 import com.solartis.test.util.common.DatabaseOperation;
@@ -15,7 +16,7 @@ public abstract class MelProcessBaseClass
 	protected DatabaseOperation expectedMelTable;
 	protected DatabaseOperation actualMelTable;
 	public abstract void importActual() throws DatabaseException, PropertiesHandleException;
-	public abstract void generateExpectedMel() throws DatabaseException, SQLException;
+	public abstract void generateExpectedMel(PropertiesHandle configFile) throws DatabaseException, SQLException;
 	public abstract LinkedHashMap<String, String> GeneratLine(LinkedHashMap<String, String> ExtendedLoopConfig, LinkedHashMap<String, String>InputOutputRow);
 	public String Lookup(String LookupKey,String LookupColumn,String TableName) throws DatabaseException
 	{

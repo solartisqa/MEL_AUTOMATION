@@ -70,4 +70,53 @@
     	<version>1.6.1</version>
 	</dependency>
   </dependencies>
+   <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            
+            <plugin>
+  				<groupId>org.apache.maven.plugins</groupId>
+ 				<artifactId>maven-assembly-plugin</artifactId>
+  				<executions>
+    				<execution>
+      					<phase>package</phase>
+      					<goals>
+       				    	<goal>single</goal>
+    				    </goals>
+      					<configuration>
+        					<archive>
+          						<manifest>
+            						<mainClass>com.solartis.test.melAutomation.MainClass</mainClass>
+          						</manifest>
+        					</archive>
+        					<descriptorRefs>
+          						<descriptorRef>jar-with-dependencies</descriptorRef>
+        					</descriptorRefs>
+      					</configuration>
+    				</execution>
+  				</executions>
+			</plugin>
+            
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-surefire-plugin</artifactId>
+		        <version>2.20</version>
+		        <configuration>
+		          <suiteXmlFiles>
+		            <suiteXmlFile>testng.xml</suiteXmlFile>
+		          </suiteXmlFiles>
+		          <systemPropertyVariables>
+		                        <Project>${Project}</Project>
+		                        <OutputChioce>${OutputChioce}</OutputChioce>
+		                        <UserName>${UserName}</UserName>
+		                        <JDBC_DRIVER>${JDBC_DRIVER}</JDBC_DRIVER>
+		                        <DB_URL>${DB_URL}</DB_URL>
+		                        <USER>${USER}</USER>
+		                        <password>${password}</password>
+		                         <ExecutionName>${ExecutionName}</ExecutionName>
+		          </systemPropertyVariables>
+		        </configuration>
+			</plugin>
+        </plugins>
+    </build>
 </project>

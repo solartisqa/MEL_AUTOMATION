@@ -37,13 +37,13 @@ public class MelProcess extends MelProcessBaseClass
 	
 	public void importActual() throws DatabaseException, PropertiesHandleException
 	{
-		PropertiesHandle DB1 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.254:3113/starrbopdb?useSSL=false","root","redhat");
+		/*PropertiesHandle DB1 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.254:3113/starrbopdb?useSSL=false","root","redhat");
 		DatabaseOperation.ConnectionSetup(DB1);
 		PropertiesHandle DB2 = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
-		DatabaseOperation.ConnectionSetup(DB2);
+		DatabaseOperation.ConnectionSetup(DB2);*/
 	}
 	
-	public void generateExpectedMel() throws DatabaseException, SQLException
+	public void generateExpectedMel(PropertiesHandle configFile) throws DatabaseException, SQLException
 	{
 		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT a INNER JOIN OUTPUT_ISO_Quote b on a.`S.No` = b.`S.No` INNER JOIN OUTPUT_ISO_PolicyIssuance c on b.`S.No` = c.`S.No`");
 		for(Entry<Integer, LinkedHashMap<String, String>> entry1 : OutputTable.entrySet())

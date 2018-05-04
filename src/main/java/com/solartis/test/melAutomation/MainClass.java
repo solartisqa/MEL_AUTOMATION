@@ -21,14 +21,17 @@ public class MainClass
 	@SuppressWarnings("unused")
 	public static void main(String args[]) throws DatabaseException, PropertiesHandleException, MacroException, SQLException, FileNotFoundException, POIException, IOException
 	{
-		PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
+		//PropertiesHandle configFile = new PropertiesHandle("com.mysql.jdbc.Driver","jdbc:mysql://192.168.84.225:3700/JmeterDB-STARR_ISO?useSSL=false","root","redhat");
+		PropertiesHandle configFile = new PropertiesHandle(System.getProperty("JDBC_DRIVER"),System.getProperty("DB_URL")+"?useSSL=false",System.getProperty("USER"),System.getProperty("password"));
 		DatabaseOperation.ConnectionSetup(configFile);
 		MelProcessBaseClass processmel = new MelProcess(configFile);
 		
-		processmel.generateExpectedMel();
+		processmel.generateExpectedMel(configFile);
 		processmel.Comparison("MelActual_copy", "MelActual");
+		
+	//	ReportOperation report = new ReportOperations("E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\SampleReport\\MELAnalysisReport.xls", "E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\Result\\");
 		ReportOperation report = new ReportOperations("E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\SampleReport\\MELAnalysisReport.xls", "E:\\RestFullAPIDeliverable\\Devolpement\\admin\\STARR-ISO\\Mel\\Result\\");
-		 Calendar calendar = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance();
 
 		    int lastDate = calendar.getActualMaximum(Calendar.DATE);
 
