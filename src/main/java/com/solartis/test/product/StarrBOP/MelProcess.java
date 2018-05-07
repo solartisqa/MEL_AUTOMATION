@@ -301,11 +301,11 @@ public class MelProcess extends MelProcessBaseClass
 				{
 					if(ExposureBasis.equals("Limit of Insurance"))
 					{
-						LookupValue="5";
-					}
-					else
-					{
 						LookupValue="7";
+					}
+					else if(ExposureBasis.equals("Annual Gross Sales"))
+					{
+						LookupValue="5";
 					}
 				}
 			}
