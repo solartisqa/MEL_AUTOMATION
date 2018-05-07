@@ -221,6 +221,10 @@ public class MelProcess extends MelProcessBaseClass
 							{
 								lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")).replace("QOT-", "BOP"));
 							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"),"N/A");
+							}
 							break;
 						}
 						case "CardType":
@@ -228,6 +232,10 @@ public class MelProcess extends MelProcessBaseClass
 							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")));
+							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"),"N/A");
 							}
 							break;
 						}
