@@ -45,7 +45,7 @@ public class MelProcess extends MelProcessBaseClass
 	
 	public void generateExpectedMel(PropertiesHandle configFile) throws DatabaseException, SQLException
 	{
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT a INNER JOIN OUTPUT_ISO_Quote b on a.`S.No` = b.`S.No` INNER JOIN OUTPUT_ISO_PolicyIssuance c on b.`S.No` = c.`S.No`");
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable=inputoutputtable.GetDataObjects("SELECT * FROM `INPUT_Quote_GL_V6` a LEFT JOIN `INPUT_GL_PolicyIssuance_V3` b ON a.S_No=b.S_No LEFT JOIN `INPUT_GL_Cancel_V2` c on a.S_No=c.S_No LEFT JOIN `OTUPUT_Quote_GL_V6` d on a.S_No=d.`S.No` LEFT JOIN `OUTPUT_GL_PolicyIssuance_V3` e on a.S_No=e.`S.No` LEFT JOIN `OUTPUT_GL_Cancel_V2` f on a.S_No=f.`S.No`");
 		for(Entry<Integer, LinkedHashMap<String, String>> entry1 : OutputTable.entrySet())
 		{
 			LinkedHashMap<String, String> InputOutputRow = entry1.getValue();
@@ -181,23 +181,15 @@ public class MelProcess extends MelProcessBaseClass
 						}
 						case "ISO_State_Exception_Ind_Code":
 						{
-							if(InputOutputRow.get("Loc_State").equals("MA"))
+							if(InputOutputRow.get("LocationDetail_State0").equals("MA") || InputOutputRow.get("LocationDetail_State0").equals("RI") || InputOutputRow.get("LocationDetail_State0").equals("MD") )
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "9");
 							}
-							else if(InputOutputRow.get("Loc_State").equals("MD"))
-							{
-								lineMap.put(configtablerow.get("FieldNames"), "8");
-							}
-							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1978")||InputOutputRow.get("YearBuilt").equals("1979")))
+							else if(InputOutputRow.get("LocationDetail_State0").equals("NJ") && (InputOutputRow.get("LeadHaveAllPremisesConstructedInOrAfter1978").equals("Yes")))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "9");
 							}
-							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1977")&&InputOutputRow.get("LeadAbatement").equals("No")))
-							{
-								lineMap.put(configtablerow.get("FieldNames"), "1");
-							}
-							else if(InputOutputRow.get("Loc_State").equals("NJ") && (InputOutputRow.get("YearBuilt").equals("1977")&&InputOutputRow.get("LeadAbatement").equals("Yes")))
+							else if(InputOutputRow.get("LocationDetail_State0").equals("NJ") && (InputOutputRow.get("LeadWishToPurchaseCoverageForPremisesCertifiedAsLeadFree").equals("Yes")))
 							{
 								lineMap.put(configtablerow.get("FieldNames"), "2");
 							}
@@ -207,23 +199,24 @@ public class MelProcess extends MelProcessBaseClass
 							}
 							break;
 						}
-						case "insuredFirstName":
+						case "ISO_Mold_Coverage_Code":
 						{
-							if(InputOutputRow.get("Entity_Type").equals("Sole Proprietor"))
+							if(InputOutputRow.get(configtablerow.get("DBColumnNames")).equals("NY") || InputOutputRow.get(configtablerow.get("DBColumnNames")).equals("AK") )
 							{
-								lineMap.put(configtablerow.get("FieldNames"), configtablerow.get("StaticValues"));
-							}
-							break;
-						}
-						case "chaseReferenceNumber":
-						{
-							if(InputOutputRow.get("ProductionChannel").equals("BOP DTC"))
-							{
-								lineMap.put(configtablerow.get("FieldNames"), InputOutputRow.get(configtablerow.get("DBColumnNames")).replace("QOT-", "BOP"));
+								lineMap.put(configtablerow.get("FieldNames"), "9");
 							}
 							else
 							{
-								lineMap.put(configtablerow.get("FieldNames"),"N/A");
+								lineMap.put(configtablerow.get("FieldNames"), "8");
+							}
+							break;
+						}
+						
+						case "insuredFirstName":
+						{
+							if(InputOutputRow.get("EntityType").equals("Sole Proprietor"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"), configtablerow.get("StaticValues"));
 							}
 							break;
 						}
@@ -277,6 +270,34 @@ public class MelProcess extends MelProcessBaseClass
 						case "Coverage":
 						{
 							lineMap.put(configtablerow.get("FieldNames"),ExtendedLoopConfig.get("CoverageOrder"));
+							break;
+						}
+						case "Total_Annual_Payroll":
+						{
+							String LookupKey=InputOutputRow.get("ClassificationDetail_Classcode0");
+							String value1=this.Lookup(LookupKey,"Value", "Mel_ExposureBasicLookup1");
+							if(value1.equalsIgnoreCase("Payroll"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"),this.DynamicLookup(ExtendedLoopConfig.get("CoverageOrder"), InputOutputRow, configtablerow.get("LookupTableName")));
+							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"),"0");
+							}
+							break;
+						}
+						case "Total_Annual_Sales":
+						{
+							String LookupKey=InputOutputRow.get("ClassificationDetail_Classcode0");
+							String value1=this.Lookup(LookupKey,"Value", "Mel_ExposureBasicLookup1");
+							if(value1.equalsIgnoreCase("Gross Sales"))
+							{
+								lineMap.put(configtablerow.get("FieldNames"),this.DynamicLookup(ExtendedLoopConfig.get("CoverageOrder"), InputOutputRow, configtablerow.get("LookupTableName")));
+							}
+							else
+							{
+								lineMap.put(configtablerow.get("FieldNames"),"0");
+							}
 							break;
 						}
 					}
